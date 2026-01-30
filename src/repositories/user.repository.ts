@@ -21,4 +21,19 @@ export class UserRepository {
     async getUserById(id: string) {
         return await User.findById(id);
     }
+
+    // 5. Get All Users (Admin)
+    async getAllUsers() {
+        return await User.find().select("-password");
+    }
+
+    // 6. Update User
+    async updateUser(id: string, data: Partial<IUser>) {
+        return await User.findByIdAndUpdate(id, data, { new: true }).select("-password");
+    }
+
+    // 7. Delete User
+    async deleteUser(id: string) {
+        return await User.findByIdAndDelete(id);
+    }
 }

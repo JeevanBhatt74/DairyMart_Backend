@@ -7,5 +7,6 @@ export interface IUser extends Document {
   phoneNumber: string;
   address: string;
   role: "user" | "admin";
+  profilePicture?: string | null;
   createdAt: Date;
 }

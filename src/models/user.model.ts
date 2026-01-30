@@ -8,6 +8,7 @@ const userSchema = new Schema<IUser>({
   phoneNumber: { type: String, required: true, unique: true },
   address: { type: String, required: true },
   role: { type: String, enum: ["user", "admin"], default: "user" },
+  profilePicture: { type: String, default: null, required: false },
   createdAt: { type: Date, default: Date.now },
 });
 
