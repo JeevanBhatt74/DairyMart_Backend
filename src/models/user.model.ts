@@ -9,6 +9,11 @@ const userSchema = new Schema<IUser>({
   address: { type: String, required: true },
   role: { type: String, enum: ["user", "admin"], default: "user" },
   profilePicture: { type: String, default: null, required: false },
+  resetPasswordOTP: { type: String, select: false },
+  resetPasswordOTPExpires: { type: Date, select: false },
+  loyaltyPoints: { type: Number, default: 0 },
+  qualifyingOrderCount: { type: Number, default: 0 },
+  discountAvailable: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
 
