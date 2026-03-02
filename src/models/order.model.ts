@@ -26,6 +26,12 @@ const OrderSchema: Schema = new Schema(
         totalAmount: { type: Number, required: true },
         shippingAddress: { type: String, required: true },
         paymentMethod: { type: String, required: true, default: "COD" },
+        paymentDetails: {
+            method: { type: String, enum: ["COD", "ESEWA", "KHALTI"], default: "COD" },
+            status: { type: String, enum: ["PENDING", "COMPLETED", "FAILED", "REFUNDED"], default: "PENDING" },
+            transactionId: { type: String },
+            pidx: { type: String }, // For Khalti
+        },
         status: {
             type: String,
             enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
