@@ -12,6 +12,10 @@ export class UserRepository {
         return await User.findOne({ email }).select("+password"); // select password for login check
     }
 
+    async getUserByEmailWithOTP(email: string) {
+        return await User.findOne({ email }).select("+resetPasswordOTP +resetPasswordOTPExpires");
+    }
+
     // 3. Get User by Phone (Required by our updated UserService)
     async getUserByPhoneNumber(phoneNumber: string) {
         return await User.findOne({ phoneNumber });
@@ -22,9 +26,24 @@ export class UserRepository {
         return await User.findById(id);
     }
 
-    // 5. Get All Users (Admin)
-    async getAllUsers() {
-        return await User.find().select("-password");
+    // 5. Get All Users (Admin) - With Pagination
+    async getAllUsers(page: number = 1, limit: number = 10) {
+        const skip = (page - 1) * limit;
+
+        const users = await User.find()
+            .select("-password")
+            .sort({ createdAt: -1 }) // Newest first
+            .skip(skip)
+            .limit(limit);
+
+        const total = await User.countDocuments();
+
+        return {
+            users,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit)
+        };
     }
 
     // 6. Update User
