@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 
 export class OrderRepository {
     async createOrder(data: Partial<IOrder>): Promise<IOrder> {
-        return await Order.create(data);
+        const order = await Order.create(data);
+        return await Order.findById(order._id).populate("items.product") as IOrder;
     }
 
     async getOrdersByUser(userId: string): Promise<IOrder[]> {
