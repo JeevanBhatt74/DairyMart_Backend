@@ -9,9 +9,23 @@ export class AdminController {
     // 1. Get All Users
     async getAllUsers(req: Request, res: Response) {
         try {
-            const users = await userRepository.getAllUsers();
-            res.status(200).json({ success: true, data: users });
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+
+            const result = await userRepository.getAllUsers(page, limit);
+
+            res.status(200).json({
+                success: true,
+                data: result.users,
+                pagination: {
+                    total: result.total,
+                    page: result.page,
+                    totalPages: result.totalPages,
+                    limit
+                }
+            });
         } catch (error) {
+            console.error("Get All Users Error:", error);
             res.status(500).json({ success: false, message: "Server Error" });
         }
     }
@@ -45,7 +59,7 @@ export class AdminController {
                 phoneNumber,
                 address,
                 role: role || "user",
-                profilePicture: req.file ? `/profile_picture/${req.file.filename}` : undefined
+                profilePicture: req.file ? `/public/profile_picture/${req.file.filename}` : undefined
             };
 
             const newUser = await userRepository.createUser(userData);
@@ -61,7 +75,7 @@ export class AdminController {
         try {
             const updates = req.body;
             if (req.file) {
-                updates.profilePicture = `/profile_picture/${req.file.filename}`;
+                updates.profilePicture = `/public/profile_picture/${req.file.filename}`;
             }
 
             // If updating password, hash it
