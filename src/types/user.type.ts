@@ -8,5 +8,10 @@ export interface IUser extends Document {
   address: string;
   role: "user" | "admin";
   profilePicture?: string | null;
+  resetPasswordOTP?: string;
+  resetPasswordOTPExpires?: Date;
+  loyaltyPoints: number;
+  qualifyingOrderCount: number;
+  discountAvailable: boolean;
   createdAt: Date;
 }
