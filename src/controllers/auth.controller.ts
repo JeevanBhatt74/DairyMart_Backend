@@ -7,7 +7,7 @@ import fs from "fs";
 const userService = new UserService();
 
 export class AuthController {
-    
+
     // Register User
     register = async (req: Request, res: Response) => {
         try {
@@ -18,7 +18,7 @@ export class AuthController {
                 return res.status(400).json({
                     success: false,
                     message: "Validation Error",
-                    errors: parsedData.error.flatten().fieldErrors 
+                    errors: parsedData.error.flatten().fieldErrors
                 });
             }
 
@@ -87,7 +87,7 @@ export class AuthController {
 
             // Get user ID from authenticated request
             const userId = (req as any).user?.id || (req as any).user?.userId || (req as any).user?._id || (req as any).userId;
-            
+
             if (!userId) {
                 console.error('🔴 No user ID found in request. Decoded token:', (req as any).user);
                 return res.status(401).json({
@@ -95,7 +95,7 @@ export class AuthController {
                     message: 'Unauthorized - User ID not found'
                 });
             }
-            
+
             console.log('✅ User ID extracted:', userId);
 
             // Construct image URL (adjust your backend URL)
@@ -145,6 +145,84 @@ export class AuthController {
                 success: false,
                 message: 'Failed to upload profile picture',
                 error: error.message
+            });
+        }
+    }
+
+    // Get User Profile
+    getProfile = async (req: Request, res: Response) => {
+        try {
+            const userId = (req as any).user?.id || (req as any).user?.userId || (req as any).user?._id || (req as any).userId;
+
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Unauthorized - User ID not found"
+                });
+            }
+
+            const user = await User.findById(userId).select("-password -__v");
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: "User not found"
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                data: user
+            });
+        } catch (error: any) {
+            console.error("Get Profile Error:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Internal Server Error"
+            });
+        }
+    }
+
+    forgotPassword = async (req: Request, res: Response) => {
+        try {
+            const { email } = req.body;
+            if (!email) return res.status(400).json({ success: false, message: "Email is required" });
+
+            const result = await userService.forgotPassword(email);
+            return res.status(200).json({ success: true, ...result });
+        } catch (error: any) {
+            return res.status(error.statusCode || 500).json({
+                success: false,
+                message: error.message || "Internal Server Error"
+            });
+        }
+    }
+
+    verifyOTP = async (req: Request, res: Response) => {
+        try {
+            const { email, otp } = req.body;
+            if (!email || !otp) return res.status(400).json({ success: false, message: "Email and OTP are required" });
+
+            const result = await userService.verifyOTP(email, otp);
+            return res.status(200).json(result);
+        } catch (error: any) {
+            return res.status(error.statusCode || 500).json({
+                success: false,
+                message: error.message || "Internal Server Error"
+            });
+        }
+    }
+
+    resetPassword = async (req: Request, res: Response) => {
+        try {
+            const { email, otp, newPassword } = req.body;
+            if (!email || !otp || !newPassword) return res.status(400).json({ success: false, message: "Email, OTP and New Password are required" });
+
+            const result = await userService.resetPassword(email, otp, newPassword);
+            return res.status(200).json(result);
+        } catch (error: any) {
+            return res.status(error.statusCode || 500).json({
+                success: false,
+                message: error.message || "Internal Server Error"
             });
         }
     }
